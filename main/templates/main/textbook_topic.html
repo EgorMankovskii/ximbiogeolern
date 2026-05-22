@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ topic.name }} - EduQuest{% endblock %}
+
+{% block content %}
+<article class="topic-page">
+    <a class="back-link" href="{% url 'main:textbook_detail' book.slug %}">← {{ book.title }}</a>
+    <p class="eyebrow">{{ book.subject }}</p>
+    <h1>{{ topic.name }}</h1>
+    <div class="topic-goal">
+        <strong>Цель</strong>
+        <span>{{ topic.goal }}</span>
+    </div>
+
+    <section class="topic-section">
+        <h2>Теория</h2>
+        <p>{{ topic.text }}</p>
+    </section>
+
+    <section class="formula-box">
+        <strong>Правило или формула</strong>
+        <code>{{ topic.formula }}</code>
+    </section>
+
+    <section class="example-box">
+        <strong>Пример</strong>
+        <span>{{ topic.example }}</span>
+    </section>
+
+    <section class="mistake-box">
+        <strong>Типичные ошибки</strong>
+        <ul>
+            {% for mistake in topic.mistakes %}
+                <li>{{ mistake }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="practice-box">
+        <strong>Мини-практика</strong>
+        <span>{{ topic.practice }}</span>
+    </section>
+</article>
+
+<nav class="step-nav">
+    {% if previous_topic %}
+        <a class="button ghost" href="{% url 'main:textbook_topic_detail' book.slug previous_topic.slug %}">← {{ previous_topic.name }}</a>
+    {% endif %}
+    {% if next_topic %}
+        <a class="button" href="{% url 'main:textbook_topic_detail' book.slug next_topic.slug %}">{{ next_topic.name }} →</a>
+    {% else %}
+        <a class="button" href="{% url 'main:textbook_detail' book.slug %}">К оглавлению</a>
+    {% endif %}
+</nav>
+{% endblock %}

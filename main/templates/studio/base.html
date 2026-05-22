@@ -1,0 +1,68 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}EduQuest Studio{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'studio/css/studio.css' %}?v=20260522">
+</head>
+<body>
+    <div class="studio-shell">
+        <aside class="studio-sidebar">
+            <a class="studio-brand" href="{% url 'main:studio_dashboard' %}">
+                <span class="studio-brand__mark">EQ</span>
+                <span>
+                    <strong>EduQuest Studio</strong>
+                    <small>управление сайтом</small>
+                </span>
+            </a>
+            <nav class="studio-nav" aria-label="Разделы студии">
+                <a class="{% if active_key == 'dashboard' %}is-active{% endif %}" href="{% url 'main:studio_dashboard' %}">
+                    <span class="studio-nav__icon">⌂</span>
+                    <span>Обзор</span>
+                </a>
+                {% for section, items in nav_groups.items %}
+                    <p>{{ section }}</p>
+                    {% for item in items %}
+                        <a class="{% if active_key == item.key %}is-active{% endif %}" href="{% url 'main:studio_model_list' item.key %}">
+                            <span class="studio-nav__icon">{{ item.icon }}</span>
+                            <span>{{ item.title }}</span>
+                        </a>
+                    {% endfor %}
+                {% endfor %}
+            </nav>
+        </aside>
+
+        <div class="studio-main">
+            <header class="studio-topbar">
+                <button class="studio-menu-button" type="button" data-studio-menu aria-label="Открыть меню">☰</button>
+                <div>
+                    <span class="studio-topbar__eyebrow">Администрирование</span>
+                    <strong>{% block header %}Панель управления{% endblock %}</strong>
+                </div>
+                <div class="studio-topbar__actions">
+                    <a href="{% url 'main:home' %}">Сайт</a>
+                    <form method="post" action="{% url 'main:studio_logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">Выйти</button>
+                    </form>
+                </div>
+            </header>
+
+            {% if messages %}
+                <div class="studio-messages">
+                    {% for message in messages %}
+                        <div class="studio-message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <main class="studio-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    <script src="{% static 'studio/js/studio.js' %}?v=20260522"></script>
+</body>
+</html>

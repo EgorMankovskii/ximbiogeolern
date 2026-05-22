@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ book.title }} - EduQuest{% endblock %}
+
+{% block content %}
+<section class="progress-hero">
+    <a class="back-link" href="{% url 'main:textbooks' %}">← Все учебники</a>
+    <p class="eyebrow">{{ book.subject }}</p>
+    <h1>{{ book.title }}</h1>
+    <p class="lead">{{ book.description }}</p>
+</section>
+
+<section class="topic-index">
+    {% for topic in book.topics %}
+        <article class="topic-index-card">
+            <span class="step-number">{{ forloop.counter }}</span>
+            <div>
+                <h2>{{ topic.name }}</h2>
+                <p>{{ topic.goal }}</p>
+            </div>
+            <a class="button ghost" href="{% url 'main:textbook_topic_detail' book.slug topic.slug %}">Читать</a>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

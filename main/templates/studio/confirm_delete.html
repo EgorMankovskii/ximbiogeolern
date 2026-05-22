@@ -1,0 +1,17 @@
+{% extends 'studio/base.html' %}
+
+{% block title %}Удаление - EduQuest Studio{% endblock %}
+{% block header %}Удаление записи{% endblock %}
+
+{% block content %}
+<section class="studio-delete">
+    <p class="studio-eyebrow">{{ config.section }}</p>
+    <h1>Удалить {{ config.singular }}?</h1>
+    <p>Запись «{{ object }}» будет удалена. Связанные данные могут быть затронуты правилами моделей Django.</p>
+    <form method="post">
+        {% csrf_token %}
+        <a class="studio-button ghost" href="{% url 'main:studio_model_edit' model_key object.pk %}">Оставить</a>
+        <button class="studio-button danger" type="submit">Удалить</button>
+    </form>
+</section>
+{% endblock %}

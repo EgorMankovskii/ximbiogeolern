@@ -1,0 +1,69 @@
+{% extends 'studio/base.html' %}
+
+{% block title %}Обзор - EduQuest Studio{% endblock %}
+{% block header %}Обзор платформы{% endblock %}
+
+{% block content %}
+<section class="studio-hero">
+    <div>
+        <p class="studio-eyebrow">Рабочая панель</p>
+        <h1>Контент, курсы и результаты учеников</h1>
+        <p>Здесь можно управлять учебными мирами, уроками, квестами, Python-задачами и смотреть историю решений.</p>
+    </div>
+    <div class="studio-hero__meta">
+        <span>Активный пользователь</span>
+        <strong>{{ request.user.username }}</strong>
+    </div>
+</section>
+
+<section class="studio-stats">
+    {% for card in cards %}
+        <a class="studio-stat" href="{{ card.url }}">
+            <span>{{ card.label }}</span>
+            <strong>{{ card.value }}</strong>
+        </a>
+    {% endfor %}
+</section>
+
+<section class="studio-grid two">
+    <div class="studio-panel">
+        <div class="studio-panel__head">
+            <h2>Последние квесты</h2>
+            <a href="{% url 'main:studio_model_list' 'submissions' %}">Все отправки</a>
+        </div>
+        <div class="studio-feed">
+            {% for item in recent_submissions %}
+                <a class="studio-feed__item" href="{% url 'main:studio_model_edit' 'submissions' item.pk %}">
+                    <span class="studio-pill {% if item.is_success %}good{% else %}danger{% endif %}">
+                        {% if item.is_success %}Решено{% else %}Ошибка{% endif %}
+                    </span>
+                    <strong>{{ item.quest.title }}</strong>
+                    <small>{{ item.quest.world.title }} · {{ item.created_at|date:'d.m.Y H:i' }}</small>
+                </a>
+            {% empty %}
+                <p class="studio-empty">Отправок пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="studio-panel">
+        <div class="studio-panel__head">
+            <h2>Последние Python-попытки</h2>
+            <a href="{% url 'main:studio_model_list' 'attempts' %}">Все попытки</a>
+        </div>
+        <div class="studio-feed">
+            {% for item in recent_attempts %}
+                <a class="studio-feed__item" href="{% url 'main:studio_model_edit' 'attempts' item.pk %}">
+                    <span class="studio-pill {% if item.is_success %}good{% else %}danger{% endif %}">
+                        {% if item.is_success %}Решено{% else %}Ошибка{% endif %}
+                    </span>
+                    <strong>{{ item.exercise.title }}</strong>
+                    <small>{{ item.created_at|date:'d.m.Y H:i' }}</small>
+                </a>
+            {% empty %}
+                <p class="studio-empty">Попыток пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

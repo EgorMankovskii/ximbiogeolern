@@ -1,0 +1,76 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}EduQuest: Научные квесты с Python{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Научные квесты с Python</p>
+        <h1>Код становится инструментом исследования</h1>
+        <p class="lead">Ученик проходит виртуальные миры: Био-купол, Квантовую лабораторию и Глобальную карту. Каждый урок идет по сценарию «Теория → Проблема → Код → визуальный результат».</p>
+        <div class="hero-actions">
+            {% for world in worlds %}
+                <a class="button" href="{% url 'main:world_detail' world.slug %}">{{ world.title }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="hero-scene stage-{{ summary.evolution_stage }}" aria-label="Анимированная научная сцена">
+        <video class="hero-video" autoplay muted loop playsinline poster="{{ MEDIA_URL }}bio.png">
+            <source src="{{ MEDIA_URL }}hero.mp4" type="video/mp4">
+        </video>
+    </div>
+</section>
+
+<section class="profile-strip">
+    <div>
+        <span class="metric">{{ summary.level }}</span>
+        <span class="caption">уровень цифрового исследователя</span>
+    </div>
+    <div>
+        <span class="metric">{{ summary.total_points }}</span>
+        <span class="caption">Research Points</span>
+    </div>
+    <div>
+        <span class="metric">{{ summary.solved }}</span>
+        <span class="caption">шагов решено</span>
+    </div>
+</section>
+
+<section class="knowledge-band">
+    <div>
+        <p class="eyebrow">Древо знаний</p>
+        <h2>Открытые концепции Python</h2>
+    </div>
+    <div class="knowledge-tags">
+        {% for concept in summary.knowledge_tree %}
+            <span>{{ concept }}</span>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="world-grid">
+    {% for world in worlds %}
+        <article class="world-card" style="--world: {{ world.color }}; --accent: {{ world.accent }};">
+            <div class="world-card__image">
+                {% if world.slug == 'biology' %}
+                    <img src="{{ MEDIA_URL }}bio.png" alt="{{ world.title }}">
+                {% elif world.slug == 'chemistry' %}
+                    <img src="{{ MEDIA_URL }}xim.png" alt="{{ world.title }}">
+                {% elif world.slug == 'geography' %}
+                    <img src="{{ MEDIA_URL }}geo.png" alt="{{ world.title }}">
+                {% else %}
+                    <img src="{% static 'eduquest/img/'|add:world.slug|add:'.svg' %}" alt="{{ world.title }}">
+                {% endif %}
+            </div>
+            <p class="eyebrow">{{ world.subject }}</p>
+            <h2>{{ world.title }}</h2>
+            <p>{{ world.intro }}</p>
+            <div class="world-card__footer">
+                <span>{{ world.quests_count }} шагов</span>
+                <a href="{% url 'main:world_detail' world.slug %}">Войти в мир</a>
+            </div>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

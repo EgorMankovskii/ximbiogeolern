@@ -1,0 +1,74 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Прогресс - EduQuest{% endblock %}
+
+{% block content %}
+<section class="progress-hero">
+    <p class="eyebrow">Профиль исследователя</p>
+    <h1>{{ summary.level }}</h1>
+    <p class="lead">Research Points, достижения и история решений сохраняются в текущей сессии браузера.</p>
+    <form class="reset-form" method="post" action="{% url 'main:reset_progress' %}" data-reset-form>
+        {% csrf_token %}
+        <input type="hidden" name="confirm_reset" value="RESET">
+        <button class="button danger" type="submit">Сбросить прогресс</button>
+    </form>
+</section>
+
+<section class="profile-strip">
+    <div>
+        <span class="metric">{{ summary.total_points }}</span>
+        <span class="caption">Research Points</span>
+    </div>
+    <div>
+        <span class="metric">{{ summary.solved }}</span>
+        <span class="caption">квестов решено</span>
+    </div>
+    <div>
+        <span class="metric">{{ summary.achievements|length }}</span>
+        <span class="caption">достижений</span>
+    </div>
+</section>
+
+<section class="knowledge-band">
+    <div>
+        <p class="eyebrow">Древо знаний</p>
+        <h2>Открытые концепции</h2>
+    </div>
+    <div class="knowledge-tags">
+        {% for concept in summary.knowledge_tree %}
+            <span>{{ concept }}</span>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="progress-layout">
+    <div class="visual-panel">
+        <h2>Прогресс по мирам</h2>
+        <canvas class="world-chart" data-worlds="{% for item in progress_items %}{{ item.world.title }}:{{ item.points }}{% if not forloop.last %},{% endif %}{% endfor %}"></canvas>
+    </div>
+    <div class="achievements">
+        <h2>Достижения</h2>
+        {% for achievement in summary.achievements %}
+            <span class="achievement">{{ achievement }}</span>
+        {% empty %}
+            <p class="empty">Первое достижение появится после решения квеста.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="history">
+    {% for submission in submissions %}
+        <article class="history-row">
+            <div>
+                <strong>{{ submission.quest.title }}</strong>
+                <span>{{ submission.quest.world.title }} · {{ submission.created_at|date:'d.m.Y H:i' }}</span>
+            </div>
+            <span class="status {% if submission.is_success %}done{% else %}bad{% endif %}">
+                {{ submission.passed_tests }}/{{ submission.total_tests }}
+            </span>
+        </article>
+    {% empty %}
+        <p class="empty">Пока нет отправок. Выберите мир и начните первый квест.</p>
+    {% endfor %}
+</section>
+{% endblock %}

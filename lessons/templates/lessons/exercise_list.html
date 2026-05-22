@@ -1,0 +1,82 @@
+{% extends 'lessons/base.html' %}
+{% load lesson_extras %}
+
+{% block title %}{% if selected_course %}{{ selected_course.title }}{% else %}Курсы{% endif %}{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div>
+        <p class="eyebrow">Учебный кабинет</p>
+        <h1>{% if selected_course %}{{ selected_course.title }}{% else %}Курсы программирования{% endif %}</h1>
+        <p class="lead">
+            {% if selected_course and selected_course.description %}
+                {{ selected_course.description }}
+            {% else %}
+                Выберите курс, решайте задачи по модулям и двигайтесь дальше, когда статистика показывает готовность.
+            {% endif %}
+        </p>
+    </div>
+    <div class="progress-panel">
+        <div>
+            <span class="metric">{{ progress.solved }}/{{ progress.total }}</span>
+            <span class="caption">решено</span>
+        </div>
+        <div>
+            <span class="metric">{{ progress.success_rate }}%</span>
+            <span class="caption">прогресс</span>
+        </div>
+        <div>
+            <span class="metric">{{ difficulty_labels|get_item:progress.recommended_difficulty }}</span>
+            <span class="caption">рекомендованный уровень</span>
+        </div>
+    </div>
+</section>
+
+<section class="course-tabs" aria-label="Курсы">
+    {% for course in courses %}
+        <a class="course-tab {% if course == selected_course %}is-active{% endif %}" href="{% url 'course_detail' course.slug %}">
+            {{ course.title }}
+        </a>
+    {% empty %}
+        <p class="empty">Курсы пока не добавлены.</p>
+    {% endfor %}
+</section>
+
+{% for section in module_sections %}
+    <section class="module-section">
+        <div class="module-heading">
+            <p class="eyebrow">Модуль {{ section.module.order }}</p>
+            <h2>{{ section.module.title }}</h2>
+            {% if section.module.description %}
+                <p>{{ section.module.description }}</p>
+            {% endif %}
+        </div>
+        <div class="task-board">
+            {% for exercise in section.exercises %}
+                <article class="task-card {% if exercise.difficulty == progress.recommended_difficulty %}is-recommended{% endif %}">
+                    <div class="task-card__meta">
+                        <span class="badge level-{{ exercise.difficulty }}">{{ exercise.get_difficulty_display }}</span>
+                        <span>{{ exercise.topic }}</span>
+                    </div>
+                    <h2>{{ exercise.title }}</h2>
+                    <p>{{ exercise.short_description }}</p>
+                    <div class="task-card__footer">
+                        {% if exercise.solved_at %}
+                            <span class="status done">Решено</span>
+                        {% elif exercise.tries %}
+                            <span class="status">Попыток: {{ exercise.tries }}</span>
+                        {% else %}
+                            <span class="status">Новая задача</span>
+                        {% endif %}
+                        <a class="button" href="{% url 'exercise_detail' exercise.slug %}">Открыть</a>
+                    </div>
+                </article>
+            {% empty %}
+                <p class="empty">В этом модуле пока нет задач.</p>
+            {% endfor %}
+        </div>
+    </section>
+{% empty %}
+    <p class="empty">В выбранном курсе пока нет модулей.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Учебники - EduQuest{% endblock %}
+
+{% block content %}
+<section class="progress-hero">
+    <p class="eyebrow">База знаний</p>
+    <h1>Учебники</h1>
+    <p class="lead">Выберите учебник, откройте оглавление и переходите к отдельным темам. Такая структура удобна, когда материалов станет больше.</p>
+</section>
+
+<section class="textbook-library">
+    {% for book in textbooks %}
+        <article class="textbook-card">
+            <p class="eyebrow">{{ book.subject }}</p>
+            <h2>{{ book.title }}</h2>
+            <p>{{ book.description }}</p>
+            <div class="textbook-meta">
+                <span>{{ book.topics|length }} тем</span>
+                <a href="{% url 'main:textbook_detail' book.slug %}">Открыть учебник</a>
+            </div>
+            <div class="textbook-topic-links">
+                {% for topic in book.topics|slice:":4" %}
+                    <a href="{% url 'main:textbook_topic_detail' book.slug topic.slug %}">{{ topic.name }}</a>
+                {% endfor %}
+            </div>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

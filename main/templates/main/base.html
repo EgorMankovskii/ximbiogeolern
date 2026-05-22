@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}EduQuest{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'eduquest/css/eduquest.css' %}?v=20260522-2">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{% url 'main:home' %}">
+            <span class="brand-mark">EQ</span>
+            <span>EduQuest</span>
+        </a>
+        <nav class="site-nav">
+            <a href="{% url 'main:home' %}">Миры</a>
+            <a href="{% url 'main:progress' %}">Прогресс</a>
+            <a href="{% url 'main:career' %}">Карьера</a>
+            <a href="{% url 'main:textbooks' %}">Учебники</a>
+            <a href="/admin/">Админка</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{% static 'eduquest/js/eduquest.js' %}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

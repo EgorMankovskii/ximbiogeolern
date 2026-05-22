@@ -1,0 +1,36 @@
+{% extends 'lessons/base.html' %}
+
+{% block title %}{{ exercise.title }}{% endblock %}
+
+{% block content %}
+<section class="task-layout">
+    <article class="statement">
+        <a class="back-link" href="{% url 'course_detail' exercise.module.course.slug %}">← {{ exercise.module.course.title }}</a>
+        <div class="task-card__meta">
+            <span class="badge level-{{ exercise.difficulty }}">{{ exercise.get_difficulty_display }}</span>
+            <span>{{ exercise.module.title }}</span>
+            <span>{{ exercise.topic }}</span>
+        </div>
+        <h1>{{ exercise.title }}</h1>
+        <p>{{ exercise.task_text|linebreaksbr }}</p>
+
+        {% if latest_attempt %}
+            <div class="result {% if latest_attempt.is_success %}result-ok{% else %}result-bad{% endif %}">
+                <strong>{% if latest_attempt.is_success %}Зачтено{% else %}Нужно поправить{% endif %}</strong>
+                <span>{{ latest_attempt.feedback }}</span>
+                <small>Тесты: {{ latest_attempt.passed_tests }}/{{ latest_attempt.total_tests }}</small>
+            </div>
+        {% endif %}
+    </article>
+
+    <form class="solution" method="post">
+        {% csrf_token %}
+        <label for="{{ form.code.id_for_label }}">Решение</label>
+        {{ form.code }}
+        {% if form.code.errors %}
+            <div class="form-error">{{ form.code.errors }}</div>
+        {% endif %}
+        <button class="button primary" type="submit">Проверить решение</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'lessons/base.html' %}
+
+{% block title %}Прогресс ученика{% endblock %}
+
+{% block content %}
+<section class="dashboard compact">
+    <div>
+        <p class="eyebrow">Прогресс</p>
+        <h1>История решений</h1>
+        <p class="lead">Здесь видны последние отправки, результат проверки и движение по задачам.</p>
+    </div>
+    <div class="progress-panel">
+        <div>
+            <span class="metric">{{ progress.solved }}</span>
+            <span class="caption">задач решено</span>
+        </div>
+        <div>
+            <span class="metric">{{ progress.attempts }}</span>
+            <span class="caption">попыток</span>
+        </div>
+        <div>
+            <span class="metric">{{ progress.success_rate }}%</span>
+            <span class="caption">общий прогресс</span>
+        </div>
+    </div>
+</section>
+
+<section class="history">
+    {% for attempt in attempts %}
+        <article class="history-row">
+            <div>
+                <strong>{{ attempt.exercise.title }}</strong>
+                <span>{{ attempt.exercise.module.course.title }} · {{ attempt.created_at|date:'d.m.Y H:i' }}</span>
+            </div>
+            <span class="status {% if attempt.is_success %}done{% endif %}">
+                {{ attempt.passed_tests }}/{{ attempt.total_tests }}
+            </span>
+            <a href="{% url 'exercise_detail' attempt.exercise.slug %}">Открыть</a>
+        </article>
+    {% empty %}
+        <p class="empty">Пока нет попыток. Откройте первую задачу и отправьте решение.</p>
+    {% endfor %}
+</section>
+{% endblock %}

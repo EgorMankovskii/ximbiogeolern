@@ -1,0 +1,563 @@
+from django.db import migrations
+
+
+BIOLOGY_LESSONS = [
+    {
+        'slug': 'dna-sequence-research',
+        'title': 'Анализ ДНК-последовательностей',
+        'intro': 'Ученик работает со строкой ДНК: считает нуклеотиды, GC-процент и ищет палиндромные фрагменты.',
+        'order': 1,
+        'min_points_required': 0,
+        'steps': [
+            {
+                'slug': 'dna-palindrome-quiz',
+                'title': 'Что важно в ДНК-анализе',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Перед обработкой последовательности нужно понять, зачем биоинформатики считают GC и палиндромы.',
+                'theory': 'GC-процент показывает долю G и C в цепочке. Палиндром в ДНК обычно читается одинаково как обратный комплемент и часто связан с сайтами узнавания ферментов.',
+                'content': {
+                    'correct': 'gc_and_palindromes',
+                    'options': [
+                        {'value': 'gc_and_palindromes', 'label': 'GC-процент помогает оценить состав цепочки, а палиндромы могут быть биологически значимыми участками.'},
+                        {'value': 'only_length', 'label': 'В ДНК важна только длина строки, состав не имеет значения.'},
+                        {'value': 'only_a', 'label': 'Нужно считать только букву A, остальные нуклеотиды не анализируют.'},
+                        {'value': 'no_pairs', 'label': 'Комплементарные пары не используются при анализе ДНК.'},
+                    ],
+                },
+                'hint': 'Вспомните пары A-T и C-G.',
+                'easier_text': 'GC — это G и C среди всех букв последовательности.',
+                'reward_points': 25,
+                'visual_kind': 'dna',
+            },
+            {
+                'slug': 'dna-sequence-analysis',
+                'title': 'Частоты, GC и палиндромы',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Дана строка из A, T, C и G. Нужно собрать краткий отчет по последовательности.',
+                'theory': 'Функция должна вернуть словарь с частотами нуклеотидов, GC-процентом и списком уникальных палиндромных фрагментов длиной от 4.',
+                'starter_code': 'def solve(dna):\n    # Верните {"counts": {...}, "gc_percent": число, "palindromes": [...]}\n    # Палиндром ДНК равен своему обратному комплементу.\n    pass\n',
+                'tests': [
+                    {'args': ['ATGCAT'], 'expected': {'counts': {'A': 2, 'T': 2, 'C': 1, 'G': 1}, 'gc_percent': 33.33, 'palindromes': ['ATGCAT', 'TGCA']}},
+                    {'args': ['GGCC'], 'expected': {'counts': {'A': 0, 'T': 0, 'C': 2, 'G': 2}, 'gc_percent': 100.0, 'palindromes': ['GGCC']}},
+                    {'args': ['ATAT'], 'expected': {'counts': {'A': 2, 'T': 2, 'C': 0, 'G': 0}, 'gc_percent': 0.0, 'palindromes': ['ATAT']}},
+                ],
+                'hint': 'Сделайте словарь complement = {"A": "T", "T": "A", "C": "G", "G": "C"}.',
+                'easier_text': 'Для палиндрома возьмите фрагмент, разверните его и замените каждую букву на комплементарную.',
+                'reward_points': 70,
+                'visual_kind': 'dna',
+            },
+        ],
+    },
+    {
+        'slug': 'population-simulation',
+        'title': 'Симуляция популяции',
+        'intro': 'Модель роста бактерий по формуле N(t) = N0 * e^(rt) с поправкой на смертность или мутации.',
+        'order': 2,
+        'min_points_required': 80,
+        'steps': [
+            {
+                'slug': 'population-growth-quiz',
+                'title': 'Экспоненциальный рост',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Колония бактерий быстро растет, но часть клеток погибает или мутирует.',
+                'theory': 'Экспоненциальная модель показывает рост при постоянной скорости r. В реальной среде к ней добавляют факторы смертности, мутаций и ограничений ресурсов.',
+                'content': {
+                    'correct': 'exponential_with_factor',
+                    'options': [
+                        {'value': 'linear_only', 'label': 'Популяция всегда растет только на одинаковое число особей.'},
+                        {'value': 'exponential_with_factor', 'label': 'Базовый рост можно считать экспоненциально, а затем учитывать смертность или мутации.'},
+                        {'value': 'random_only', 'label': 'Формулы не нужны, достаточно случайного числа.'},
+                        {'value': 'no_time', 'label': 'Время не влияет на численность бактерий.'},
+                    ],
+                },
+                'hint': 'Смотрите на формулу N0 * e^(rt).',
+                'easier_text': 'Если смертность 0.1, остается 90% расчетной популяции.',
+                'reward_points': 25,
+                'visual_kind': 'chart',
+            },
+            {
+                'slug': 'bacteria-growth-with-mortality',
+                'title': 'Рост с фактором смертности',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Нужно подготовить данные для графика роста популяции. Вместо настоящего matplotlib верните список точек, который можно отрисовать.',
+                'theory': 'В песочнице импорты отключены, поэтому задача проверяет расчет данных для графика. Значение e доступно через функцию exp(...).',
+                'starter_code': 'def solve(n0, r, t, mortality_rates):\n    # Верните список численности для моментов 0..t.\n    # Для шага > 0 умножайте расчет на (1 - mortality_rates[step - 1]).\n    pass\n',
+                'tests': [
+                    {'args': [100, 0.5, 2, [0, 0]], 'expected': [100, 165, 272]},
+                    {'args': [100, 0.5, 2, [0.1, 0.2]], 'expected': [100, 148, 217]},
+                    {'args': [50, 0, 3, [0, 0.5, 0]], 'expected': [50, 50, 25, 50]},
+                ],
+                'hint': 'Используйте round(n0 * exp(r * step) * survival).',
+                'easier_text': 'Для step == 0 смертность не применяйте, верните начальное N0.',
+                'reward_points': 70,
+                'visual_kind': 'chart',
+            },
+        ],
+    },
+    {
+        'slug': 'protein-sequence-research',
+        'title': 'Анализ белковых последовательностей',
+        'intro': 'Подсчет аминокислот, определение гидрофобных/гидрофильных остатков и поиск повторяющихся мотивов.',
+        'order': 3,
+        'min_points_required': 160,
+        'steps': [
+            {
+                'slug': 'protein-groups-quiz',
+                'title': 'Свойства аминокислот',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Исследователь получил белковую цепочку и должен понять, какие участки могут быть гидрофобными.',
+                'theory': 'Гидрофобные аминокислоты чаще избегают воды и могут располагаться внутри белка или в мембранных участках.',
+                'content': {
+                    'correct': 'hydrophobic_core',
+                    'options': [
+                        {'value': 'hydrophobic_core', 'label': 'Гидрофобные остатки часто стремятся уйти от воды и формируют внутренние или мембранные участки.'},
+                        {'value': 'all_same', 'label': 'Все аминокислоты имеют одинаковые свойства.'},
+                        {'value': 'dna_letters', 'label': 'Белки всегда записываются буквами A, T, C, G.'},
+                        {'value': 'no_motifs', 'label': 'Повторяющиеся мотивы в белках не анализируют.'},
+                    ],
+                },
+                'hint': 'Вспомните, что белки записывают аминокислотными буквами.',
+                'easier_text': 'Гидрофобный означает плохо взаимодействующий с водой.',
+                'reward_points': 25,
+                'visual_kind': 'protein',
+            },
+            {
+                'slug': 'protein-sequence-analysis',
+                'title': 'Подсчет аминокислот и мотивов',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Нужно написать функцию для первичного анализа белковой последовательности.',
+                'theory': 'Функция считает буквы, количество гидрофобных и гидрофильных аминокислот, а также повторяющиеся мотивы длиной 3.',
+                'starter_code': 'def solve(sequence):\n    # Верните {"counts": {...}, "hydrophobic": число, "hydrophilic": число, "motifs": [...]}\n    pass\n',
+                'tests': [
+                    {'args': ['AVILSTAVIL'], 'expected': {'counts': {'A': 2, 'V': 2, 'I': 2, 'L': 2, 'S': 1, 'T': 1}, 'hydrophobic': 8, 'hydrophilic': 2, 'motifs': ['AVI', 'VIL']}},
+                    {'args': ['MFWYRK'], 'expected': {'counts': {'F': 1, 'K': 1, 'M': 1, 'R': 1, 'W': 1, 'Y': 1}, 'hydrophobic': 4, 'hydrophilic': 2, 'motifs': []}},
+                ],
+                'hint': 'Гидрофобные: A, V, I, L, M, F, W, Y. Гидрофильные: R, N, D, Q, E, K, S, T, H, C.',
+                'easier_text': 'Мотив — это подстрока длиной 3, которая встретилась больше одного раза.',
+                'reward_points': 70,
+                'visual_kind': 'protein',
+            },
+        ],
+    },
+    {
+        'slug': 'species-dna-comparison',
+        'title': 'Сравнение ДНК разных видов',
+        'intro': 'Сравнение двух цепочек: процент идентичности, список мутаций и сходство по GC-контенту.',
+        'order': 4,
+        'min_points_required': 240,
+        'steps': [
+            {
+                'slug': 'species-identity-quiz',
+                'title': 'Что показывает идентичность',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Даны две ДНК-последовательности разных видов. Нужно понять, какие метрики сравнения полезны.',
+                'theory': 'Процент идентичности показывает долю совпадающих позиций. Мутации — позиции, где нуклеотиды отличаются.',
+                'content': {
+                    'correct': 'matches_and_mutations',
+                    'options': [
+                        {'value': 'matches_and_mutations', 'label': 'Нужно считать совпадения, различия и сравнивать состав последовательностей.'},
+                        {'value': 'only_first', 'label': 'Достаточно посмотреть только первую букву.'},
+                        {'value': 'ignore_gc', 'label': 'GC-контент никогда не используют при сравнении.'},
+                        {'value': 'random', 'label': 'Процент идентичности выбирается случайно.'},
+                    ],
+                },
+                'hint': 'Сравнение идет позиция за позицией.',
+                'easier_text': 'Если из 4 позиций совпали 3, идентичность равна 75%.',
+                'reward_points': 25,
+                'visual_kind': 'dna',
+            },
+            {
+                'slug': 'compare-species-dna',
+                'title': 'Идентичность и мутации',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Напишите функцию, которая сравнит две последовательности одинаковой длины.',
+                'theory': 'Ответ должен включать процент идентичности, список мутаций в формате [позиция, буква1, буква2] и сходство GC-контента.',
+                'starter_code': 'def solve(seq1, seq2):\n    # Верните {"identity_percent": число, "mutations": [...], "gc_similarity": число}\n    pass\n',
+                'tests': [
+                    {'args': ['ATGC', 'ATGT'], 'expected': {'identity_percent': 75.0, 'mutations': [[4, 'C', 'T']], 'gc_similarity': 75.0}},
+                    {'args': ['GGCC', 'GGCC'], 'expected': {'identity_percent': 100.0, 'mutations': [], 'gc_similarity': 100.0}},
+                ],
+                'hint': 'GC-сходство можно считать как 100 - abs(gc1 - gc2).',
+                'easier_text': 'Позиции мутаций в ответе делайте с 1, а не с 0.',
+                'reward_points': 70,
+                'visual_kind': 'dna',
+            },
+        ],
+    },
+    {
+        'slug': 'mendel-genetics',
+        'title': 'Моделирование наследования генов',
+        'intro': 'Менделевская генетика для двух признаков: гаметы, генотипы, фенотипы и дерево скрещивания.',
+        'order': 5,
+        'min_points_required': 320,
+        'steps': [
+            {
+                'slug': 'mendel-dihybrid-quiz',
+                'title': 'Доминантные и рецессивные признаки',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Перед скрещиванием растений нужно разобраться, как читать пары A/a и B/b.',
+                'theory': 'Заглавная буква обычно обозначает доминантный аллель. Для двух признаков удобно строить гаметы и таблицу потомства.',
+                'content': {
+                    'correct': 'dominant_uppercase',
+                    'options': [
+                        {'value': 'dominant_uppercase', 'label': 'A и B считаются доминантными аллелями, a и b — рецессивными.'},
+                        {'value': 'lower_dominant', 'label': 'Всегда доминантны только строчные буквы.'},
+                        {'value': 'no_probability', 'label': 'Вероятности потомства нельзя посчитать.'},
+                        {'value': 'one_parent', 'label': 'Для скрещивания нужен только один родитель.'},
+                    ],
+                },
+                'hint': 'Доминантный признак проявляется, если есть хотя бы одна заглавная буква.',
+                'easier_text': 'Aa дает два варианта гаметы: A и a.',
+                'reward_points': 25,
+                'visual_kind': 'tree',
+            },
+            {
+                'slug': 'mendel-dihybrid-probabilities',
+                'title': 'Вероятности фенотипов',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Нужно смоделировать скрещивание двух растений с генотипами вроде AaBb.',
+                'theory': 'Функция должна перебрать гаметы родителей и вернуть проценты фенотипов: A_B_, A_bb, aaB_, aabb.',
+                'starter_code': 'def solve(parent1, parent2):\n    # parent1 и parent2 — строки вроде "AaBb". Верните проценты фенотипов.\n    pass\n',
+                'tests': [
+                    {'args': ['AaBb', 'AaBb'], 'expected': {'A_B_': 56.25, 'A_bb': 18.75, 'aaB_': 18.75, 'aabb': 6.25}},
+                    {'args': ['AABB', 'aabb'], 'expected': {'A_B_': 100.0, 'A_bb': 0.0, 'aaB_': 0.0, 'aabb': 0.0}},
+                ],
+                'hint': 'Сначала получите гаметы: для AaBb это AB, Ab, aB, ab.',
+                'easier_text': 'Фенотип A_B_ означает: в первом признаке есть A, во втором есть B.',
+                'reward_points': 70,
+                'visual_kind': 'tree',
+            },
+        ],
+    },
+    {
+        'slug': 'ecosystem-data-analysis',
+        'title': 'Анализ экосистемных данных',
+        'intro': 'CSV-подобные данные о видах: индекс Шеннона, доминирующие виды и данные для гистограммы.',
+        'order': 6,
+        'min_points_required': 400,
+        'steps': [
+            {
+                'slug': 'shannon-index-quiz',
+                'title': 'Зачем нужен индекс Шеннона',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'В разных зонах есть животные разных видов. Нужно оценить разнообразие, а не только общее количество.',
+                'theory': 'Индекс Шеннона учитывает и количество видов, и равномерность их распределения. Чем он выше, тем разнообразнее сообщество.',
+                'content': {
+                    'correct': 'diversity_evenness',
+                    'options': [
+                        {'value': 'diversity_evenness', 'label': 'Он учитывает богатство видов и равномерность распределения.'},
+                        {'value': 'only_biggest', 'label': 'Он показывает только самый крупный вид.'},
+                        {'value': 'temperature', 'label': 'Он измеряет температуру зоны.'},
+                        {'value': 'dna', 'label': 'Он показывает длину ДНК каждого животного.'},
+                    ],
+                },
+                'hint': 'Шеннон связан с разнообразием.',
+                'easier_text': 'Если все особи одного вида, разнообразие ниже.',
+                'reward_points': 25,
+                'visual_kind': 'chart',
+            },
+            {
+                'slug': 'ecosystem-shannon-index',
+                'title': 'Индекс Шеннона и доминирующие виды',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Даны строки CSV в виде словарей: зона, вид, количество. Нужно подготовить экологический отчет.',
+                'theory': 'Функция log(x, 2) доступна в песочнице. Верните индекс Шеннона по зонам и доминирующий вид.',
+                'starter_code': 'def solve(rows):\n    # rows: [{"zone": "...", "species": "...", "count": число}]\n    # Верните {"shannon": {...}, "dominant": {...}}\n    pass\n',
+                'tests': [
+                    {'args': [[{'zone': 'forest', 'species': 'fox', 'count': 10}, {'zone': 'forest', 'species': 'wolf', 'count': 10}]], 'expected': {'shannon': {'forest': 1.0}, 'dominant': {'forest': 'fox'}}},
+                    {'args': [[{'zone': 'lake', 'species': 'duck', 'count': 30}, {'zone': 'lake', 'species': 'frog', 'count': 10}]], 'expected': {'shannon': {'lake': 0.811}, 'dominant': {'lake': 'duck'}}},
+                ],
+                'hint': 'Для каждого вида p = count / total, вклад равен -p * log(p, 2).',
+                'easier_text': 'Доминирующий вид — тот, у которого count больше всех в зоне.',
+                'reward_points': 70,
+                'visual_kind': 'chart',
+            },
+        ],
+    },
+    {
+        'slug': 'evolution-simulation',
+        'title': 'Симуляция эволюции',
+        'intro': 'Цифровой генотип, отбор, мутации и изменение среднего значения по поколениям.',
+        'order': 7,
+        'min_points_required': 480,
+        'steps': [
+            {
+                'slug': 'evolution-selection-quiz',
+                'title': 'Идея естественного отбора',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Популяция организмов имеет числовой генотип. Среда пропускает не всех.',
+                'theory': 'Если особи с определенными признаками выживают чаще, средние характеристики популяции меняются по поколениям.',
+                'content': {
+                    'correct': 'selection_changes_mean',
+                    'options': [
+                        {'value': 'selection_changes_mean', 'label': 'Отбор может менять средний генотип популяции.'},
+                        {'value': 'no_change', 'label': 'Отбор никогда не меняет популяцию.'},
+                        {'value': 'only_one', 'label': 'В популяции всегда остается ровно одна особь.'},
+                        {'value': 'no_generations', 'label': 'Поколения не нужны для модели эволюции.'},
+                    ],
+                },
+                'hint': 'Выживают не все, поэтому среднее может сдвигаться.',
+                'easier_text': 'Если оставить только большие числа, среднее вырастет.',
+                'reward_points': 25,
+                'visual_kind': 'evolution',
+            },
+            {
+                'slug': 'evolution-generations',
+                'title': 'Средний генотип по поколениям',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Смоделируйте несколько поколений отбора и мутаций.',
+                'theory': 'В каждом поколении выживают генотипы >= target. Новая популяция: survivors + каждый survivor, увеличенный на 1.',
+                'starter_code': 'def solve(genotypes, target, generations):\n    # Верните список средних значений: стартовое и после каждого поколения.\n    pass\n',
+                'tests': [
+                    {'args': [[1, 2, 3, 4], 3, 2], 'expected': [2.5, 4.0, 4.5]},
+                    {'args': [[5, 5], 6, 3], 'expected': [5.0]},
+                ],
+                'hint': 'Если никто не выжил, остановите симуляцию.',
+                'easier_text': 'Среднее = sum(population) / len(population), округлите до 2 знаков.',
+                'reward_points': 70,
+                'visual_kind': 'evolution',
+            },
+        ],
+    },
+    {
+        'slug': 'cell-image-processing',
+        'title': 'Обработка изображений клеток',
+        'intro': 'Учебная модель OpenCV: клеточное изображение уже размечено числами, нужно посчитать клетки и аномалии.',
+        'order': 8,
+        'min_points_required': 560,
+        'steps': [
+            {
+                'slug': 'cell-image-quiz',
+                'title': 'Что делает сегментация',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Черно-белое изображение клеток сначала нужно превратить в объекты, которые можно считать.',
+                'theory': 'В реальном OpenCV сегментация отделяет клетки от фона. В учебной задаче каждая клетка уже помечена своим номером.',
+                'content': {
+                    'correct': 'segments_objects',
+                    'options': [
+                        {'value': 'segments_objects', 'label': 'Сегментация помогает выделить отдельные объекты на изображении.'},
+                        {'value': 'text_only', 'label': 'Сегментация нужна только для текста.'},
+                        {'value': 'no_count', 'label': 'После сегментации клетки нельзя считать.'},
+                        {'value': 'always_color', 'label': 'Сегментация работает только с цветными фотографиями.'},
+                    ],
+                },
+                'hint': 'Нужно отделить клетку от фона.',
+                'easier_text': 'Фон обозначен 0, клетки — положительными числами.',
+                'reward_points': 25,
+                'visual_kind': 'cells',
+            },
+            {
+                'slug': 'cell-matrix-analysis',
+                'title': 'Подсчет клеток и аномалий',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Дана матрица изображения: 0 — фон, положительные числа — идентификаторы клеток.',
+                'theory': 'Функция должна посчитать количество клеток, средний размер и номера клеток, которые слишком маленькие или большие.',
+                'starter_code': 'def solve(image, min_size, max_size):\n    # Верните {"count": число, "average_size": число, "anomalies": [id, ...]}\n    pass\n',
+                'tests': [
+                    {'args': [[[1, 1, 0], [0, 2, 2], [3, 0, 0]], 2, 3], 'expected': {'count': 3, 'average_size': 1.67, 'anomalies': [3]}},
+                    {'args': [[[1, 1], [1, 1]], 2, 3], 'expected': {'count': 1, 'average_size': 4.0, 'anomalies': [1]}},
+                ],
+                'hint': 'Считайте, сколько раз встречается каждый положительный id.',
+                'easier_text': 'Аномалия: размер < min_size или размер > max_size.',
+                'reward_points': 70,
+                'visual_kind': 'cells',
+            },
+        ],
+    },
+    {
+        'slug': 'microbiome-analysis',
+        'title': 'Анализ микробиома',
+        'intro': 'Процентное соотношение бактерий в пробах, общие бактерии и данные для круговой диаграммы.',
+        'order': 9,
+        'min_points_required': 640,
+        'steps': [
+            {
+                'slug': 'microbiome-quiz',
+                'title': 'Что показывает микробиом',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'В разных пробах найдены бактерии. Нужно понять, какие виды общие, а какие доминируют.',
+                'theory': 'Микробиом описывает сообщество микроорганизмов. Проценты помогают сравнивать пробы разного размера.',
+                'content': {
+                    'correct': 'relative_and_common',
+                    'options': [
+                        {'value': 'relative_and_common', 'label': 'Важно считать доли бактерий и искать виды, встречающиеся во всех пробах.'},
+                        {'value': 'only_total', 'label': 'Нужно знать только общий размер каждой пробы.'},
+                        {'value': 'ignore_species', 'label': 'Названия бактерий не важны.'},
+                        {'value': 'no_chart', 'label': 'Круговая диаграмма никогда не подходит для долей.'},
+                    ],
+                },
+                'hint': 'Сравнивать удобнее проценты, а не только количества.',
+                'easier_text': 'Общие бактерии есть в каждой пробе.',
+                'reward_points': 25,
+                'visual_kind': 'pie',
+            },
+            {
+                'slug': 'microbiome-distribution',
+                'title': 'Проценты и общие бактерии',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Подготовьте данные для анализа микробиома и круговой диаграммы.',
+                'theory': 'Функция возвращает проценты по каждой пробе, общие бактерии и суммарные проценты по всем пробам.',
+                'starter_code': 'def solve(samples):\n    # samples = {"sample1": {"Bacteria": count, ...}, ...}\n    # Верните {"percentages": ..., "common": [...], "pie_data": {...}}\n    pass\n',
+                'tests': [
+                    {'args': [{'s1': {'A': 30, 'B': 10}, 's2': {'A': 20, 'C': 20}}], 'expected': {'percentages': {'s1': {'A': 75.0, 'B': 25.0}, 's2': {'A': 50.0, 'C': 50.0}}, 'common': ['A'], 'pie_data': {'A': 62.5, 'B': 12.5, 'C': 25.0}}},
+                    {'args': [{'x': {'L': 5}, 'y': {'L': 5}}], 'expected': {'percentages': {'x': {'L': 100.0}, 'y': {'L': 100.0}}, 'common': ['L'], 'pie_data': {'L': 100.0}}},
+                ],
+                'hint': 'Процент = count / total * 100, округляйте до 2 знаков.',
+                'easier_text': 'Для common пересеките множества бактерий всех проб.',
+                'reward_points': 70,
+                'visual_kind': 'pie',
+            },
+        ],
+    },
+    {
+        'slug': 'phenotype-prediction',
+        'title': 'Прогнозирование фенотипа',
+        'intro': 'Предсказание фенотипа по наборам аллелей для нескольких пользователей.',
+        'order': 10,
+        'min_points_required': 720,
+        'steps': [
+            {
+                'slug': 'phenotype-rules-quiz',
+                'title': 'Правила наследования',
+                'task_type': 'quiz',
+                'difficulty': 2,
+                'step_order': 1,
+                'story': 'Есть несколько генотипов. Нужно понять, как из правил получить наблюдаемый признак.',
+                'theory': 'Фенотип можно определять по набору правил: например, наличие доминантного B дает карий цвет глаз, а P — наличие белка.',
+                'content': {
+                    'correct': 'rules_from_alleles',
+                    'options': [
+                        {'value': 'rules_from_alleles', 'label': 'Фенотип можно вычислять по правилам, которые проверяют нужные аллели.'},
+                        {'value': 'always_same', 'label': 'У всех генотипов всегда один и тот же фенотип.'},
+                        {'value': 'no_genotype', 'label': 'Генотип не влияет на фенотип.'},
+                        {'value': 'only_name', 'label': 'Фенотип зависит только от имени человека.'},
+                    ],
+                },
+                'hint': 'Ищите доминантные буквы в строке генотипа.',
+                'easier_text': 'Если в генотипе есть B, глаза считаем карими.',
+                'reward_points': 25,
+                'visual_kind': 'phenotype',
+            },
+            {
+                'slug': 'phenotype-prediction-rules',
+                'title': 'Фенотип по генотипу',
+                'task_type': 'python',
+                'difficulty': 3,
+                'step_order': 2,
+                'story': 'Напишите функцию, которая обработает несколько пользователей и предскажет признаки.',
+                'theory': 'Правила учебной модели: если в genotype есть B — eyes = brown, иначе blue. Если есть P — protein = present, иначе absent.',
+                'starter_code': 'def solve(users):\n    # users = [{"name": "...", "genotype": "..."}, ...]\n    # Верните словарь name -> {"eyes": ..., "protein": ...}\n    pass\n',
+                'tests': [
+                    {'args': [[{'name': 'Ana', 'genotype': 'BbPp'}, {'name': 'Tim', 'genotype': 'bbpp'}]], 'expected': {'Ana': {'eyes': 'brown', 'protein': 'present'}, 'Tim': {'eyes': 'blue', 'protein': 'absent'}}},
+                    {'args': [[{'name': 'Mia', 'genotype': 'bbPp'}]], 'expected': {'Mia': {'eyes': 'blue', 'protein': 'present'}}},
+                ],
+                'hint': 'Проверяйте символ через оператор in.',
+                'easier_text': 'Для каждого пользователя создайте вложенный словарь с ключами eyes и protein.',
+                'reward_points': 70,
+                'visual_kind': 'phenotype',
+            },
+        ],
+    },
+]
+
+
+def update_biology_module(apps, schema_editor):
+    World = apps.get_model('main', 'World')
+    Lesson = apps.get_model('main', 'Lesson')
+    Quest = apps.get_model('main', 'Quest')
+
+    biology = World.objects.get(slug='biology')
+    biology.intro = (
+        'Био-купол с задачами по биоинформатике, генетике, популяциям, экосистемам, '
+        'микробиому и обработке клеточных данных на Python.'
+    )
+    biology.save(update_fields=['intro'])
+
+    # Старые биологические задания не удаляем, а скрываем: история решений не ломается,
+    # но на сайте ученик видит новый модуль из 10 исследований.
+    Quest.objects.filter(world=biology).update(is_active=False)
+    Lesson.objects.filter(world=biology).update(is_active=False)
+
+    for lesson_data in BIOLOGY_LESSONS:
+        steps = lesson_data['steps']
+        lesson, _ = Lesson.objects.update_or_create(
+            world=biology,
+            slug=lesson_data['slug'],
+            defaults={
+                'title': lesson_data['title'],
+                'intro': lesson_data['intro'],
+                'order': lesson_data['order'],
+                'min_points_required': lesson_data['min_points_required'],
+                'is_active': True,
+            },
+        )
+        for step in steps:
+            Quest.objects.update_or_create(
+                slug=step['slug'],
+                defaults={
+                    'world': biology,
+                    'lesson': lesson,
+                    'title': step['title'],
+                    'task_type': step['task_type'],
+                    'difficulty': step['difficulty'],
+                    'story': step['story'],
+                    'theory': step['theory'],
+                    'starter_code': step.get('starter_code', ''),
+                    'tests': step.get('tests', []),
+                    'content': step.get('content', {}),
+                    'hint': step['hint'],
+                    'easier_text': step.get('easier_text', ''),
+                    'reward_points': step['reward_points'],
+                    'visual_kind': step['visual_kind'],
+                    'order': step['step_order'],
+                    'step_order': step['step_order'],
+                    'is_active': True,
+                },
+            )
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('main', '0009_report_alignment_content'),
+    ]
+
+    operations = [
+        migrations.RunPython(update_biology_module, migrations.RunPython.noop),
+    ]

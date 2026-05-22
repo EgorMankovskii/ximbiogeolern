@@ -1,0 +1,93 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ world.title }} - EduQuest{% endblock %}
+
+{% block content %}
+<section class="world-hero" style="--world: {{ world.color }}; --accent: {{ world.accent }};">
+    <div>
+        <a class="back-link" href="{% url 'main:home' %}">← Все миры</a>
+        <p class="eyebrow">{{ world.subject }}</p>
+        <h1>{{ world.title }}</h1>
+        <p class="lead">{{ world.intro }}</p>
+    </div>
+    <div class="world-stats">
+        <div>
+            <span class="metric">{{ progress.points }}</span>
+            <span class="caption">Research Points в мире</span>
+        </div>
+        <div>
+            <span class="metric">{{ progress.solved_count }}</span>
+            <span class="caption">шагов закрыто</span>
+        </div>
+    </div>
+</section>
+
+<section class="map-layout">
+    <div class="quest-map" style="--world: {{ world.color }}; --accent: {{ world.accent }};">
+        <img src="{% static 'eduquest/img/'|add:world.slug|add:'.svg' %}" alt="">
+        {% for item in lessons %}
+            {% with lesson=item.lesson %}
+                {% if item.is_unlocked %}
+                    <a class="map-node node-{{ forloop.counter }} {% if lesson.solved_steps == lesson.steps_count and lesson.steps_count %}is-done{% endif %}" href="{% url 'main:lesson_detail' world.slug lesson.slug %}">
+                        {{ forloop.counter }}
+                    </a>
+                {% else %}
+                    <span class="map-node node-{{ forloop.counter }} is-locked">{{ forloop.counter }}</span>
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+    <div class="visual-panel evolution-panel stage-{{ summary.evolution_stage }}">
+        <h2>Визуальная эволюция</h2>
+        <canvas class="mini-chart" data-points="{{ progress.points }}" data-solved="{{ progress.solved_count }}"></canvas>
+        <p>Верные решения добавляют RP и постепенно оживляют мир: появляются новые элементы, маршруты и лабораторные объекты.</p>
+        <div class="evolution-items">
+            <span>🌱</span>
+            <span>⚗</span>
+            <span>🗺</span>
+        </div>
+    </div>
+</section>
+
+<section class="theme-sections">
+    {% for group in lesson_groups %}
+        <div class="theme-section">
+            <div class="theme-head">
+                <div>
+                    <p class="eyebrow">Тема</p>
+                    <h2>{{ group.title }}</h2>
+                </div>
+                <span class="status">{{ group.lessons|length }} уроков</span>
+            </div>
+            <div class="lesson-list">
+                {% for item in group.lessons %}
+                    {% with lesson=item.lesson %}
+                        <article class="quest-card lesson-card {% if not item.is_unlocked %}is-locked{% endif %}">
+                            <div>
+                                <span class="badge level-2">Урок {{ lesson.order }}</span>
+                                <span class="status">{{ lesson.solved_steps }}/{{ lesson.steps_count }} шагов</span>
+                                {% if lesson.min_points_required %}
+                                    <span class="status">от {{ lesson.min_points_required }} RP</span>
+                                {% endif %}
+                                {% if lesson.solved_steps == lesson.steps_count and lesson.steps_count %}
+                                    <span class="status done">Завершен</span>
+                                {% elif lesson.failed_steps %}
+                                    <span class="status bad">Есть ошибки</span>
+                                {% endif %}
+                            </div>
+                            <h2>{{ lesson.title }}</h2>
+                            <p>{{ lesson.intro }}</p>
+                            {% if item.is_unlocked %}
+                                <a class="button ghost" href="{% url 'main:lesson_detail' world.slug lesson.slug %}">Открыть урок</a>
+                            {% else %}
+                                <span class="button locked-button">Закрыто до {{ lesson.min_points_required }} RP</span>
+                            {% endif %}
+                        </article>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

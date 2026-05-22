@@ -1,0 +1,125 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ quest.title }} - EduQuest{% endblock %}
+
+{% block content %}
+<section class="quest-layout" style="--world: {{ quest.world.color }}; --accent: {{ quest.world.accent }};">
+    <article class="quest-brief">
+        {% if quest.lesson %}
+            <a class="back-link" href="{% url 'main:lesson_detail' quest.world.slug quest.lesson.slug %}">← {{ quest.lesson.title }}</a>
+        {% else %}
+            <a class="back-link" href="{% url 'main:world_detail' quest.world.slug %}">← {{ quest.world.title }}</a>
+        {% endif %}
+        <span class="badge level-{{ quest.difficulty }}">{{ quest.get_difficulty_display }}</span>
+        <span class="status">{{ quest.get_task_type_display }}</span>
+        <h1>{{ quest.title }}</h1>
+        <p>{{ quest.story }}</p>
+
+        <div class="scenario-rail">
+            <span>Теория</span>
+            <span>Проблема</span>
+            <span>{% if quest.task_type == 'python' %}Код{% else %}Ответ{% endif %}</span>
+            <span>Визуальный результат</span>
+        </div>
+
+        {% if lesson_steps %}
+            <div class="step-strip">
+                {% for step in lesson_steps %}
+                    <a class="{% if step.id == quest.id %}is-current{% endif %} {% if step.solved_at %}status-ok{% elif step.failed_at %}status-bad{% endif %}" href="{% url 'main:quest_detail' quest.world.slug step.slug %}">
+                        {{ forloop.counter }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="science-note">
+            <strong>Научная справка</strong>
+            <span>{{ quest.theory }}</span>
+        </div>
+
+        {% if latest %}
+            <div class="result {% if latest.is_success %}result-ok{% else %}result-bad{% endif %}">
+                <strong>{% if latest.is_success %}Квест закрыт{% else %}Экспедиция требует правки{% endif %}</strong>
+                <span>{{ latest.feedback }}</span>
+                <small>Тесты: {{ latest.passed_tests }}/{{ latest.total_tests }}</small>
+            </div>
+            {% if latest.is_success %}
+                <div class="visual-unlock kind-{{ quest.visual_kind }}">
+                    <strong>Визуальный результат</strong>
+                    <span>Мир реагирует на решение: открывается новый элемент исследования и начисляются Research Points.</span>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if show_hint %}
+            <div class="adaptive-box">
+                <strong>Подсказка</strong>
+                <span>{{ quest.hint }}</span>
+            </div>
+        {% endif %}
+        {% if show_easier and quest.easier_text %}
+            <div class="adaptive-box soft">
+                <strong>Упрощенный вариант</strong>
+                <span>{{ quest.easier_text }}</span>
+            </div>
+        {% endif %}
+    </article>
+
+    <form class="code-panel" method="post">
+        {% csrf_token %}
+        {% if quest.task_type == 'python' %}
+            <div class="panel-head">
+                <label for="{{ form.code.id_for_label }}">Python-редактор</label>
+                <span>solve(...)</span>
+            </div>
+            {{ form.code }}
+            <button class="button primary" type="submit">Запустить проверку</button>
+        {% elif quest.task_type == 'quiz' %}
+            <div class="panel-head">
+                <strong>Мини-тест</strong>
+                <span>1 правильный ответ</span>
+            </div>
+            <div class="answer-grid">
+                {% for option in quest.content.options %}
+                    <label class="answer-card">
+                        <input type="radio" name="answer" value="{{ option.value }}" required>
+                        <span>{{ option.label }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+            <button class="button primary" type="submit">Проверить ответ</button>
+        {% elif quest.task_type == 'match' %}
+            <div class="panel-head">
+                <strong>Сопоставление</strong>
+                <span>соедините понятия</span>
+            </div>
+            <div class="match-board">
+                {% for pair in quest.content.pairs %}
+                    <label class="match-row">
+                        <span class="match-picture">{{ pair.picture }}</span>
+                        <span>{{ pair.prompt }}</span>
+                        <select name="match_{{ forloop.counter0 }}" required>
+                            <option value="">Выберите ответ</option>
+                            {% for option in quest.content.options %}
+                                <option value="{{ option.value }}">{{ option.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                {% endfor %}
+            </div>
+            <button class="button primary" type="submit">Проверить пары</button>
+        {% endif %}
+    </form>
+</section>
+
+<nav class="step-nav">
+    {% if previous_step %}
+        <a class="button ghost" href="{% url 'main:quest_detail' quest.world.slug previous_step.slug %}">← Предыдущий шаг</a>
+    {% endif %}
+    {% if next_step %}
+        <a class="button" href="{% url 'main:quest_detail' quest.world.slug next_step.slug %}">Следующий шаг →</a>
+    {% elif quest.lesson %}
+        <a class="button" href="{% url 'main:lesson_detail' quest.world.slug quest.lesson.slug %}">Вернуться к уроку</a>
+    {% endif %}
+</nav>
+{% endblock %}

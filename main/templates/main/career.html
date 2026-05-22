@@ -1,0 +1,87 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Карьера химика - EduQuest{% endblock %}
+
+{% block content %}
+<section class="career-hero">
+    <div>
+        <p class="eyebrow">Игровой прогресс</p>
+        <h1>Карьера химика</h1>
+        <p class="lead">Персонаж растет вместе с учебным прогрессом: чем больше задач решено и RP накоплено, тем выше должность и больше доступных улучшений.</p>
+    </div>
+    <div class="chemist-card">
+        <div class="chemist-avatar" aria-hidden="true">
+            <span class="chemist-head"></span>
+            <span class="chemist-body"></span>
+            <span class="chemist-flask"></span>
+        </div>
+        <h2>{{ current_stage.title }}</h2>
+        <p>{{ current_stage.description }}</p>
+    </div>
+</section>
+
+<section class="profile-strip">
+    <div>
+        <span class="metric">{{ total_points }}</span>
+        <span class="caption">общих RP</span>
+    </div>
+    <div>
+        <span class="metric">{{ chemistry_points }}</span>
+        <span class="caption">RP в химии</span>
+    </div>
+    <div>
+        <span class="metric">{{ active_count }}</span>
+        <span class="caption">улучшений активно</span>
+    </div>
+</section>
+
+<section class="career-track">
+    <div class="career-track__head">
+        <div>
+            <p class="eyebrow">Лестница должностей</p>
+            <h2>{{ current_stage.title }}</h2>
+        </div>
+        {% if next_stage %}
+            <span class="status">следующая: {{ next_stage.title }} от {{ next_stage.points }} RP</span>
+        {% else %}
+            <span class="status done">максимальная должность</span>
+        {% endif %}
+    </div>
+    <div class="career-bar" aria-label="Прогресс до следующей должности">
+        <span style="width: {{ career_percent }}%"></span>
+    </div>
+    <div class="career-stages">
+        <span class="stage-dot is-active">1</span>
+        <span class="stage-dot {% if total_points >= 60 %}is-active{% endif %}">2</span>
+        <span class="stage-dot {% if total_points >= 140 %}is-active{% endif %}">3</span>
+        <span class="stage-dot {% if total_points >= 260 %}is-active{% endif %}">4</span>
+        <span class="stage-dot {% if total_points >= 420 %}is-active{% endif %}">5</span>
+    </div>
+</section>
+
+<section class="upgrade-grid">
+    {% for upgrade in upgrades %}
+        <article class="upgrade-card {% if upgrade.is_active %}is-active{% elif not upgrade.is_unlocked %}is-locked{% endif %}">
+            <div>
+                <span class="badge level-{% if upgrade.is_unlocked %}2{% else %}1{% endif %}">
+                    {% if upgrade.is_active %}Установлено{% elif upgrade.is_unlocked %}Доступно{% else %}{{ upgrade.points }} RP{% endif %}
+                </span>
+            </div>
+            <h2>{{ upgrade.title }}</h2>
+            <p>{{ upgrade.description }}</p>
+            <span class="upgrade-effect">{{ upgrade.effect }}</span>
+            {% if upgrade.is_active %}
+                <span class="button locked-button">Уже улучшено</span>
+            {% elif upgrade.is_unlocked %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="upgrade_id" value="{{ upgrade.id }}">
+                    <button class="button primary" type="submit">Улучшить</button>
+                </form>
+            {% else %}
+                <span class="button locked-button">Нужно {{ upgrade.points }} RP</span>
+            {% endif %}
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}

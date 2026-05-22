@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}PyTeacher{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260522">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="{% url 'exercise_list' %}">PyTeacher</a>
+        <div class="topbar__actions">
+            <nav class="nav">
+                <a href="{% url 'exercise_list' %}">Курсы</a>
+                <a href="{% url 'progress' %}">Прогресс</a>
+                <a href="/admin/">Админка</a>
+            </nav>
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Переключить тему">
+                <span data-theme-icon>☾</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="page">
+        {% block content %}{% endblock %}
+    </main>
+    <script src="{% static 'js/theme.js' %}"></script>
+</body>
+</html>

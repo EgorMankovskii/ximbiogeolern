@@ -1,0 +1,43 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ lesson.title }} - EduQuest{% endblock %}
+
+{% block content %}
+<section class="world-hero" style="--world: {{ lesson.world.color }}; --accent: {{ lesson.world.accent }};">
+    <div>
+        <a class="back-link" href="{% url 'main:world_detail' lesson.world.slug %}">← {{ lesson.world.title }}</a>
+        <p class="eyebrow">Урок {{ lesson.order }}</p>
+        <h1>{{ lesson.title }}</h1>
+        <p class="lead">{{ lesson.intro }}</p>
+    </div>
+</section>
+
+<section class="step-board">
+    {% for step in steps %}
+        <article class="step-card {% if step.solved_at %}is-done{% elif step.failed_at %}is-failed{% endif %}">
+            <span class="step-number {% if step.solved_at %}status-ok{% elif step.failed_at %}status-bad{% endif %}">{{ forloop.counter }}</span>
+            <div>
+                <span class="badge level-{{ step.difficulty }}">{{ step.get_task_type_display }}</span>
+                <h2>{{ step.title }}</h2>
+                <p>{{ step.story }}</p>
+                {% if step.solved_at %}
+                    <span class="status done">Шаг пройден</span>
+                {% elif step.failed_at %}
+                    <span class="status bad">Есть ошибка</span>
+                {% elif step.tries %}
+                    <span class="status">Попыток: {{ step.tries }}</span>
+                {% else %}
+                    <span class="status">Новый шаг</span>
+                {% endif %}
+            </div>
+            <a class="button ghost" href="{% url 'main:quest_detail' lesson.world.slug step.slug %}">Открыть</a>
+        </article>
+    {% empty %}
+        <p class="empty">В уроке пока нет шагов.</p>
+    {% endfor %}
+</section>
+
+{% if first_step %}
+    <a class="button primary lesson-start" style="--world: {{ lesson.world.color }}" href="{% url 'main:quest_detail' lesson.world.slug first_step.slug %}">Начать урок</a>
+{% endif %}
+{% endblock %}

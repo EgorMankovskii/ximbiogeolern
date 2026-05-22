@@ -1,0 +1,64 @@
+{% extends 'studio/base.html' %}
+
+{% block title %}
+{% if object %}{{ object }}{% else %}Новая запись{% endif %} - EduQuest Studio
+{% endblock %}
+{% block header %}{{ config.title }}{% endblock %}
+
+{% block content %}
+<section class="studio-page-head">
+    <div>
+        <p class="studio-eyebrow">{{ config.section }}</p>
+        <h1>{% if object %}{{ object }}{% else %}Создать {{ config.singular }}{% endif %}</h1>
+        <p>
+            {% if mode == 'view' %}
+                Запись открыта только для просмотра.
+            {% elif object %}
+                Отредактируйте поля и сохраните изменения.
+            {% else %}
+                Заполните поля, чтобы добавить новую запись.
+            {% endif %}
+        </p>
+    </div>
+    <div class="studio-page-actions">
+        <a class="studio-button ghost" href="{% url 'main:studio_model_list' model_key %}">Назад к списку</a>
+        {% if object and config.editable %}
+            <a class="studio-button danger" href="{% url 'main:studio_model_delete' model_key object.pk %}">Удалить</a>
+        {% endif %}
+    </div>
+</section>
+
+<form class="studio-form" method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div class="studio-form-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    {% for group_title, fields in field_groups %}
+        <section class="studio-form-section">
+            <h2>{{ group_title }}</h2>
+            <div class="studio-form-grid">
+                {% for field in fields %}
+                    <label class="studio-field {% if field.field.widget.input_type == 'checkbox' %}is-checkbox{% endif %}">
+                        <span>{{ field.label }}</span>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small>{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <em>{{ field.errors }}</em>
+                        {% endif %}
+                    </label>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+
+    <div class="studio-submit">
+        <a class="studio-button ghost" href="{% url 'main:studio_model_list' model_key %}">Отмена</a>
+        {% if mode != 'view' %}
+            <button class="studio-button primary" type="submit">Сохранить</button>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

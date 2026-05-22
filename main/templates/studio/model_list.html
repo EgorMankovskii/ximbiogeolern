@@ -1,0 +1,68 @@
+{% extends 'studio/base.html' %}
+
+{% block title %}{{ config.title }} - EduQuest Studio{% endblock %}
+{% block header %}{{ config.title }}{% endblock %}
+
+{% block content %}
+<section class="studio-page-head">
+    <div>
+        <p class="studio-eyebrow">{{ config.section }}</p>
+        <h1>{{ config.title }}</h1>
+        <p>Найдено записей: {{ total_count }}</p>
+    </div>
+    {% if config.editable %}
+        <a class="studio-button primary" href="{% url 'main:studio_model_create' model_key %}">Создать</a>
+    {% endif %}
+</section>
+
+<section class="studio-panel">
+    <form class="studio-toolbar" method="get">
+        <label>
+            <span>Поиск</span>
+            <input class="studio-input" type="search" name="q" value="{{ query }}" placeholder="Название, тема, текст">
+        </label>
+        <button class="studio-button" type="submit">Найти</button>
+        {% if query %}
+            <a class="studio-button ghost" href="{% url 'main:studio_model_list' model_key %}">Сбросить</a>
+        {% endif %}
+    </form>
+
+    <div class="studio-table-wrap">
+        <table class="studio-table">
+            <thead>
+                <tr>
+                    {% for column in config.columns %}
+                        <th>{{ column.1 }}</th>
+                    {% endfor %}
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        {% for cell in row.cells %}
+                            <td data-label="{{ cell.label }}">{{ cell.value }}</td>
+                        {% endfor %}
+                        <td data-label="Действия">
+                            <div class="studio-row-actions">
+                                <a href="{% url 'main:studio_model_edit' model_key row.object.pk %}">
+                                    {% if config.editable %}Открыть{% else %}Смотреть{% endif %}
+                                </a>
+                                {% if config.editable %}
+                                    <a class="danger" href="{% url 'main:studio_model_delete' model_key row.object.pk %}">Удалить</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="{{ config.columns|length|add:1 }}">
+                            <p class="studio-empty">Записей не найдено.</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

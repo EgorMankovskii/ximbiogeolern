@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | EduQuest Admin{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'admin/css/eduquest_admin.css' %}?v=20260522">
+{% endblock %}
+
+{% block branding %}
+<div class="admin-brand">
+    <a href="{% url 'admin:index' %}" class="admin-brand__mark">EQ</a>
+    <div>
+        <div class="admin-brand__title">EduQuest Admin</div>
+        <div class="admin-brand__subtitle">контент, курсы и прогресс</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+<nav class="admin-quicknav" aria-label="Быстрые ссылки">
+    <a href="{% url 'main:home' %}">Сайт</a>
+    <a href="{% url 'main:textbooks' %}">Учебники</a>
+    <a href="{% url 'main:progress' %}">Прогресс</a>
+</nav>
+{% endblock %}

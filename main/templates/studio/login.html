@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Вход - EduQuest Studio</title>
+    <link rel="stylesheet" href="{% static 'studio/css/studio.css' %}?v=20260522">
+</head>
+<body class="studio-login-page">
+    <main class="studio-login">
+        <section class="studio-login__card">
+            <a class="studio-brand studio-login__brand" href="{% url 'main:home' %}">
+                <span class="studio-brand__mark">EQ</span>
+                <span>
+                    <strong>EduQuest Studio</strong>
+                    <small>админ-панель сайта</small>
+                </span>
+            </a>
+            <div>
+                <p class="studio-eyebrow">Вход для администратора</p>
+                <h1>Управление контентом</h1>
+                <p>Используйте учетную запись staff-пользователя.</p>
+            </div>
+            <form class="studio-login__form" method="post" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="studio-form-errors">{{ form.non_field_errors }}</div>
+                {% endif %}
+                {% for field in form %}
+                    <label class="studio-field">
+                        <span>{{ field.label }}</span>
+                        {{ field }}
+                        {% if field.errors %}<em>{{ field.errors }}</em>{% endif %}
+                    </label>
+                {% endfor %}
+                <button class="studio-button primary" type="submit">Войти</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
