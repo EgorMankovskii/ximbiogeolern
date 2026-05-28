@@ -211,7 +211,8 @@ h2 {
 
 .hero-scene {
     position: relative;
-    min-height: 420px;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     background: #10241f;
 }
